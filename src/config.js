@@ -4,3 +4,4 @@ export const config = {
   usuarioGitHub: 'Achtli-Iyari-Holguin-Leon',
   equipo: 'Equipo espiral (ASKI)',
   negocio: 'Alitach'
+}
