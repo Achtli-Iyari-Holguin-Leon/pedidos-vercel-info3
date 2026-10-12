@@ -63,36 +63,68 @@ export function validarCliente(cliente) {
   return errores
 }
 
-// ----------------------------------------------------------------------------
-// MISIÓN 4 · RF5 — ¿Cuántos pedidos hay en cada estado?
-// ----------------------------------------------------------------------------
-// Devuelve un objeto con TODOS los estados como llave, aunque tengan 0:
-//   { registrado: 3, en_preparacion: 3, listo: 2, entregado: 2 }
-// Con una lista vacía, todos van en 0.
+
+ // MISION 4
+
 export function resumenPorEstado(pedidos) {
-  return {} // TODO
+  const resumen = {}
+
+  ESTADOS.forEach(estado => {
+    resumen[estado] = 0
+  })
+
+  pedidos.forEach(pedido => {
+    if (ESTADOS.includes(pedido.estado)) {
+      resumen[pedido.estado]++
+    }
+  })
+
+  return resumen
 }
 
-// ----------------------------------------------------------------------------
-// MISIÓN 5 · RF5 — Buscar pedidos por nombre de cliente
-// ----------------------------------------------------------------------------
-// Devuelve los pedidos cuyo cliente CONTIENE el texto buscado, sin importar
-// mayúsculas ni acentos: "ramirez" encuentra a "Ana Ramírez" y "JOSÉ" a
-// "José Martínez". Un texto vacío (o solo espacios) devuelve todos.
-// Pista: 'Ramírez'.normalize('NFD').replace(/[̀-ͯ]/g, '')
-//        Investiga qué hace NFD. Es un problema real en sistemas en español.
+// MISION 5
+
 export function buscarPedidos(pedidos, texto) {
-  return [] // TODO
+  const normalizar = valor =>
+    String(valor || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+
+  const busqueda = normalizar(texto || '').trim()
+
+  if (!busqueda) {
+    return pedidos
+  }
+
+  return pedidos.filter(pedido =>
+    normalizar(pedido.cliente).includes(busqueda)
+  )
 }
 
-// ----------------------------------------------------------------------------
-// MISIÓN 6 · DESTACADO — Los mejores clientes
-// ----------------------------------------------------------------------------
-// Devuelve los `n` clientes que más han gastado, sumando el total de TODOS sus
-// pedidos (reutiliza totalPedido, no copies la lógica).
-// Formato: [{ cliente: 'Ana Ramírez', total: 1316 }, ...]
-// Orden: total de mayor a menor; si empatan, por nombre alfabético.
-// Pista: un objeto acumulador, luego Object.entries, map y sort.
+// MISION 6
+
 export function topClientes(pedidos, n) {
-  return [] // TODO
+  const totales = {}
+
+  pedidos.forEach(pedido => {
+    const cliente = pedido.cliente
+
+    if (!(cliente in totales)) {
+      totales[cliente] = 0
+    }
+
+    totales[cliente] += totalPedido(pedido)
+  })
+
+  return Object.entries(totales)
+    .map(([cliente, total]) => ({
+      cliente,
+      total: Math.round((total + Number.EPSILON) * 100) / 100
+    }))
+    .sort((a, b) =>
+      b.total - a.total ||
+      a.cliente.localeCompare(b.cliente, 'es')
+    )
+    .slice(0, n)
 }
