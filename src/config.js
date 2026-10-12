@@ -3,5 +3,4 @@ export const config = {
   nombre: 'Holguin Leon Achtli',
   usuarioGitHub: 'Achtli-Iyari-Holguin-Leon',
   equipo: 'Equipo espiral (ASKI)',
-  negocio: 'Alitach',
-}
+  negocio: 'Alitach'

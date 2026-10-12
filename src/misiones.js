@@ -15,46 +15,52 @@
 
 import { ESTADOS } from './datos.js'
 
-// ----------------------------------------------------------------------------
-// MISIÓN 1 · RF3 — ¿Cuánto paga el cliente?
-// ----------------------------------------------------------------------------
-// Recibe un pedido: { items: [{ cantidad, precioUnitario }], descuento }
-//   - subtotal = suma de (cantidad × precioUnitario) de cada item
-//   - descuento es una fracción (0.1 = 10 %). Si no viene, es 0.
-//   - total = subtotal × (1 − descuento), REDONDEADO a 2 decimales.
-//   - Un pedido sin items cuesta 0.
-// Pista: prueba en la consola 0.1 + 0.2 y verás por qué hay que redondear.
-//        Math.round(x * 100) / 100
+//MISION 1:
+
 export function totalPedido(pedido) {
-  return 0 // TODO
+  const items = pedido.items || []
+  const descuento = pedido.descuento || 0
+
+  const subtotal = items.reduce((suma, item) => {
+    return suma + item.cantidad * item.precioUnitario
+  }, 0)
+
+  const total = subtotal * (1 - descuento)
+
+  return Math.round((total + Number.EPSILON) * 100) / 100
 }
 
-// ----------------------------------------------------------------------------
-// MISIÓN 2 · RF4 — ¿Este cambio de estado es válido?
-// ----------------------------------------------------------------------------
-// Los estados avanzan en orden y SOLO un paso a la vez:
-//   registrado → en_preparacion → listo → entregado
-// Devuelve true únicamente si `nuevo` es el estado inmediatamente siguiente
-// de `actual`. Saltar pasos, regresar o moverse desde "entregado" es false.
-// Un estado que no existe también es false.
-// Pista: ESTADOS ya es un arreglo ordenado. ¿Qué te dice indexOf?
+//MISION 2:
+
 export function puedeTransicionar(actual, nuevo) {
-  return true // TODO: hoy acepta cualquier cosa. ¿Qué tan grave sería eso en producción?
+  const indiceActual = ESTADOS.indexOf(actual)
+  const indiceNuevo = ESTADOS.indexOf(nuevo)
+
+  return indiceActual !== -1 && indiceNuevo === indiceActual + 1
 }
 
-// ----------------------------------------------------------------------------
-// MISIÓN 3 · RF1 — ¿Los datos del cliente son válidos?
-// ----------------------------------------------------------------------------
-// Recibe { nombre, telefono, email } y devuelve un ARREGLO con los códigos de
-// error que apliquen, en este orden. Si todo está bien, devuelve [].
-//   'nombre_requerido'  → nombre vacío o solo espacios
-//   'telefono_invalido' → después de quitar espacios y guiones, no son
-//                         exactamente 10 dígitos
-//   'email_invalido'    → el email VIENE (no está vacío) y no tiene forma de
-//                         correo: algo@algo.algo   (el email es opcional)
-// Pista: '55 1234-5678'.replace(/[\s-]/g, '')   y   /^\d{10}$/.test(...)
+//MISION 3
+
 export function validarCliente(cliente) {
-  return [] // TODO
+  const errores = []
+
+  if (!cliente.nombre || !cliente.nombre.trim()) {
+    errores.push('nombre_requerido')
+  }
+
+  const telefono = (cliente.telefono || '').replace(/[\s-]/g, '')
+
+  if (!/^\d{10}$/.test(telefono)) {
+    errores.push('telefono_invalido')
+  }
+
+  const email = (cliente.email || '').trim()
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errores.push('email_invalido')
+  }
+
+  return errores
 }
 
 // ----------------------------------------------------------------------------
